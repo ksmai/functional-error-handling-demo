@@ -1,43 +1,43 @@
-class Right<T> {
-  private readonly x: T;
+class Right<E, A> {
+  private readonly a: A;
 
-  constructor(x: T) {
-      this.x = x;
+  constructor(a: A) {
+      this.a = a;
   }
 
   isLeft() {
     return false;
   }
 
-  isRight(): this is Right<T> {
+  isRight(): this is Right<E, A> {
     return true;
   }
 
-  static of<T>(x: T) {
-      return new Right(x);
+  static of<E, A>(a: A): Either<E, A> {
+      return new Right(a);
   }
 
-  map<U>(f: (x: T) => U) {
-      return new Right<U>(f(this.x));
+  map<U>(f: (a: A) => U): Either<E, U> {
+      return new Right<E, U>(f(this.a));
   }
 
-  chain<U>(f: (x: T) => U) {
-      return f(this.x);
+  chain<U>(f: (a: A) => U) {
+      return f(this.a);
   }
 
   get value() {
-    return this.x;
+    return this.a;
   }
 }
 
-class Left<E> {
+class Left<E, A> {
   private readonly e: E;
 
   constructor(e: E) {
       this.e = e;
   }
 
-  isLeft(): this is Left<E> {
+  isLeft(): this is Left<E, A> {
     return true;
   }
 
@@ -45,12 +45,12 @@ class Left<E> {
     return false;
   }
 
-  static of<E>(e: E) {
+  static of<E, A>(e: E): Either<E, A> {
       return new Left(e);
   }
 
-  map<U>(f: (e: E) => U) {
-      return this;
+  map<U>(f: (a: A) => U): Either<E, U> {
+      return Left.of<E, U>(this.e);
   }
 
   chain<U>(f: (e: E) => U) {
@@ -62,9 +62,9 @@ class Left<E> {
   }
 }
 
-type Either<E, A> = Left<E> | Right<A>;
-function left<E>(e: E) { return Left.of(e); }
-function right<T>(x: T) { return Right.of(x); }
+type Either<E, A> = Left<E, A> | Right<E, A>;
+function left<E, A>(e: E): Either<E, A> { return Left.of<E, A>(e); }
+function right<E, A>(x: A) { return Right.of<E, A>(x); }
 
 class UserName {
   private name: string;
@@ -142,4 +142,18 @@ function createUser1(name: string, email: string, password: string): Either<E, U
   return Right.of(new User(userName.value, userEmail.value, userPassword.value));
 }
 
-console.log(createUser1("ababcabcccc", "email@example.com", "pass!"));
+/*
+function createUser2(name: string, email: string, password: string): Either<E, Either<E, Either<E, User>>> {
+  const userName: Either<E, UserName> = UserName.parse(name);
+
+  const userEmail: Either<E, Either<E, UserEmail>> = 
+    userName.map(() => UserEmail.parse(email));
+
+  const userPassword: Either<E, Either<E, Either<E, UserPassword>>> =
+    userEmail.map((inner) => inner.map(() => UserPassword.parse(password)));
+
+  return userPassword.map(x => x.map(y => y.map(() => new User(userName.value, userEmail.value.value, userPassword.value.value.value))));
+}
+*/
+
+console.log(createUser1("name name name", "email@x", "pa!ss"));
