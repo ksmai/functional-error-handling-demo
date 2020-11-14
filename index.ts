@@ -17,11 +17,11 @@ class Right<E, A> {
       return new Right(a);
   }
 
-  map<U>(f: (a: A) => U): Either<E, U> {
-      return new Right<E, U>(f(this.a));
+  map<B>(f: (a: A) => B): Either<E, B> {
+      return new Right<E, B>(f(this.a));
   }
 
-  chain<U>(f: (a: A) => U) {
+  chain<B>(f: (a: A) => Either<E, B>): Either<E, B> {
       return f(this.a);
   }
 
@@ -49,12 +49,12 @@ class Left<E, A> {
       return new Left(e);
   }
 
-  map<U>(f: (a: A) => U): Either<E, U> {
-      return Left.of<E, U>(this.e);
+  map<B>(f: (a: A) => B): Either<E, B> {
+      return this as any as Left<E, B>;
   }
 
-  chain<U>(f: (e: E) => U) {
-      return this;
+  chain<B>(f: (a: A) => Either<E, B>): Either<E, B> {
+      return this as any as Left<E, B>;
   }
 
   get value() {
@@ -162,4 +162,11 @@ function createUser2(name: string, email: string, password: string): Either<E, E
   ));
 }
 
-console.log(JSON.stringify(createUser2("name name", "emailx", "pass")))
+function createUser3(name: string, email: string, password: string): Either<E, User> {
+  return UserName.parse(name).chain((userName: UserName) =>
+      UserEmail.parse(email).chain((userEmail: UserEmail) =>
+        UserPassword.parse(password).map((userPassword: UserPassword) =>
+          new User(userName, userEmail, userPassword))));
+}
+
+console.log(createUser3("name name name", "email@x", "!!pass"));
