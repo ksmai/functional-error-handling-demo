@@ -163,6 +163,17 @@ function createUser2(name: string, email: string, password: string): Either<E, E
 }
 
 function createUser3(name: string, email: string, password: string): Either<E, User> {
+  const userName: Either<E, UserName> = UserName.parse(name);
+  const userEmail: Either<E, UserEmail> = userName.chain(() => UserEmail.parse(email));
+  const userPassword: Either<E, UserPassword> = userEmail.chain(() => UserPassword.parse(password));
+  return userPassword.map(() => new User(
+    userName.value as UserName,
+    userEmail.value as UserEmail,
+    userPassword.value as UserPassword,
+  ));
+}
+
+function createUser4(name: string, email: string, password: string): Either<E, User> {
   return UserName.parse(name).chain((userName: UserName) =>
       UserEmail.parse(email).chain((userEmail: UserEmail) =>
         UserPassword.parse(password).map((userPassword: UserPassword) =>
@@ -175,3 +186,5 @@ console.log(createUser2("A very long user name", "foo@bar.com", "!!pass!!!"));
 console.log(createUser2("too short", "foo@bar.com", "!!pass!!!"));
 console.log(createUser3("A very long user name", "foo@bar.com", "!!pass!!!"));
 console.log(createUser3("too short", "foo@bar.com", "!!pass!!!"));
+console.log(createUser4("A very long user name", "foo@bar.com", "!!pass!!!"));
+console.log(createUser4("too short", "foo@bar.com", "!!pass!!!"));
