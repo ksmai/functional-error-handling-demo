@@ -169,4 +169,9 @@ function createUser3(name: string, email: string, password: string): Either<E, U
           new User(userName, userEmail, userPassword))));
 }
 
-console.log(createUser3("name name name", "email@x", "!!pass"));
+console.log(createUser1("A very long user name", "foo@bar.com", "!!pass!!!"));
+console.log(createUser1("too short", "foo@bar.com", "!!pass!!!"));
+console.log(createUser2("A very long user name", "foo@bar.com", "!!pass!!!"));
+console.log(createUser2("too short", "foo@bar.com", "!!pass!!!"));
+console.log(createUser3("A very long user name", "foo@bar.com", "!!pass!!!"));
+console.log(createUser3("too short", "foo@bar.com", "!!pass!!!"));
