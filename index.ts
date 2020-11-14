@@ -142,7 +142,6 @@ function createUser1(name: string, email: string, password: string): Either<E, U
   return Right.of(new User(userName.value, userEmail.value, userPassword.value));
 }
 
-/*
 function createUser2(name: string, email: string, password: string): Either<E, Either<E, Either<E, User>>> {
   const userName: Either<E, UserName> = UserName.parse(name);
 
@@ -152,8 +151,15 @@ function createUser2(name: string, email: string, password: string): Either<E, E
   const userPassword: Either<E, Either<E, Either<E, UserPassword>>> =
     userEmail.map((inner) => inner.map(() => UserPassword.parse(password)));
 
-  return userPassword.map(x => x.map(y => y.map(() => new User(userName.value, userEmail.value.value, userPassword.value.value.value))));
+  return userPassword.map(x => x.map(
+    y => y.map(
+      () => new User(
+        userName.value as UserName,
+        (userEmail.value as Either<E, UserEmail>).value as UserEmail,
+        ((userPassword.value as Either<E, Either<E, UserPassword>>).value as Either<E, UserPassword>).value as UserPassword
+      )
+    )
+  ));
 }
-*/
 
-console.log(createUser1("name name name", "email@x", "pa!ss"));
+console.log(JSON.stringify(createUser2("name name", "emailx", "pass")))
